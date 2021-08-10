@@ -5,7 +5,13 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true, trim: true, lowercase: true },
   password: { type: String, required: true },
   cpfOrcnpj: { type: String, required: true, unique: true},
-  transactionId: { type: Schema.Types.ObjectId, ref: "Transaction" }
+  type: { type: String, required: true, enum: ["PF", "PJ"]},
+  account: {
+    agency: { type: String, required: true, default: "001" },
+    accountNumber: { type: Number, required: true, unique: true },
+    balance: { type: Number, required: true, default: 0, min: 0 },
+  },
+  transactionId: [{ type: Schema.Types.ObjectId, ref: "Transaction" }]
 });
 
 const UserModel = model("User", UserSchema);

@@ -70,26 +70,29 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// cRud (READ) - HTTP GET
-// Buscar dados do usuário
-router.get("/profile", (req, res) => {
-  console.log(req.headers);
-  console.log(req.currentUser);
+// // cRud (READ) - HTTP GET
+// // Buscar dados do usuário => parametro de rota :userId
+// router.get("/profile/:userId", (req, res) => {
+//   console.log(req.headers);
+//   console.log(req.currentUser);
 
-  try {
-    // Buscar o usuário logado
-    const loggedInUser = req.currentUser;
+//   try {
+//     // Buscar o usuário logado
 
-    if (loggedInUser) {
-      // Responder o cliente com os dados do usuário. O status 200 significa OK
-      return res.status(200).json(loggedInUser);
-    } else {
-      return res.status(404).json({ msg: "User not found." });
-    }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
-  }
-});
+//     const { userId } = req.params
+    
+
+
+//     if (loggedInUser) {
+//       // Responder o cliente com os dados do usuário. O status 200 significa OK
+//       return res.status(200).json(loggedInUser);
+//     } else {
+//       return res.status(404).json({ msg: "User not found." });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: JSON.stringify(err) });
+//   }
+// });
 
 module.exports = router;
