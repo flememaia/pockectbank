@@ -19,9 +19,6 @@ router.post("/newtransaction", async (req, res) => {
     console.log(user.accountBalance)
     console.log(user._id)
 
-    //#################DELETAR
-    // return res.status(200).json(user);
-
     // Confere se quem está iniciando a transação é PJ, se sim, já encerra com msg de que a transação não é permitida.
     if (user.type === "PJ"){
       console.log("Esta transação não é permitida")
@@ -40,13 +37,9 @@ router.post("/newtransaction", async (req, res) => {
     // Se autorizado, gerar a transação
     if( isAuthorized.message === "Autorizado"){
       const newTransaction = await TransactionModel.create({...req.body, userId: user._id})
-    //#################DELETAR
-      // return res.status(200).json(newTransaction);
 
     // Localizar e atualizar o balance do payee e incluir o id da transação no payee
     const userPayee = await UserModel.findOne({ id: payee});
-    //#################DELETAR
-    // return res.status(200).json(userPayee);
 
     const updatedUserPayeeAccount = await UserModel.findOneAndUpdate(
       { _id: userPayee._id },
@@ -58,8 +51,6 @@ router.post("/newtransaction", async (req, res) => {
       },
       { new: true }
     );
-
-    // return res.status(200).json(updatedUserPayeeAccount);
 
     // atualizar o balance do payer para negativo (incrementar valor negativo)
     value = (- value)
@@ -75,8 +66,6 @@ router.post("/newtransaction", async (req, res) => {
       },
       { new: true }
     );
-
-    // return res.status(200).json(updatedUserAccount);
 
     // Enviar notificação de recebimento de pagamento de um serviço externo. 
     const confirmation = sendConfirmation() 
