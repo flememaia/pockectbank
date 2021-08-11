@@ -1,29 +1,9 @@
 const router = require("express").Router();
-const axios = require("axios")
 
 const UserModel = require("../models/User.model");
 const TransactionModel = require("../models/Transaction.model");
-
-async function getAuthorization() {
-  try {
-    const response = await axios.get("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6"); 
-    console.log(response.data)
-    return response.data
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function sendConfirmation() {
-  try {
-    const response = await axios.get("http://o4d9z.mocklab.io/notify"); 
-    console.log(response.data)
-    return response.data
-  } catch (err) {
-    console.error(err);
-  }
-}
-
+const getAuthorization = require ("../config/isAuthorized")
+const sendConfirmation = require("../config/sendConfirmation")
 
 router.post("/newtransaction", async (req, res) => {
 
