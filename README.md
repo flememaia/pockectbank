@@ -17,7 +17,8 @@ Aplicação simplificada de transferências entre seus usuários (back-end).
 ![diagrama entidade-relacionamento](diagram.png)
 
 ## Techs used
-JavaScript
-MongoDB
-Express
-Axios
+- JavaScript
+- Nodejs
+- MongoDB
+- Express
+- Axios
