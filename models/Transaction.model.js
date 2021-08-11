@@ -8,7 +8,7 @@ const TransactionSchema = new Schema(
     payee: { type: Number, required: true }, // payee is the one that gets the money
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
-  { timestamps: true } // tells Mongoose to automatically manage createdAt and updatedAt properties on your documents.
+  { timestamps: true } // automatically manage createdAt and updatedAt properties.
 );
 
 const TransactionModel = model("Transaction", TransactionSchema);
