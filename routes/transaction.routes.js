@@ -1,36 +1,15 @@
 const router = require("express").Router();
-const axios = require("axios")
 
 const UserModel = require("../models/User.model");
 const TransactionModel = require("../models/Transaction.model");
-
-async function getAuthorization() {
-  try {
-    const response = await axios.get("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6"); 
-    console.log(response.data)
-    return response.data
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function sendConfirmation() {
-  try {
-    const response = await axios.get("http://o4d9z.mocklab.io/notify"); 
-    console.log(response.data)
-    return response.data
-  } catch (err) {
-    console.error(err);
-  }
-}
-
+const getAuthorization = require ("../config/isAuthorized")
+const sendConfirmation = require("../config/sendConfirmation")
 
 router.post("/newtransaction", async (req, res) => {
 
   try {
 
-    // req.body sempre vem de quem inicia a transação "Efetuar Pagamento". 
-    // Logo, type sempre será "Efetuar Pagamento".
+    // req.body sempre vem de quem inicia a transação, logo, sempre será "Efetuar Pagamento". 
 
     const { type, payer, payee } = req.body
 
@@ -38,12 +17,12 @@ router.post("/newtransaction", async (req, res) => {
 
     // console.log(payer, value, payee)
 
-    //###### PENDENTE
-    //COMO USAR OPERADOR $or PRA PROCURAR O FULLNAME OU O CPF/CNPJ
-
     // Localizar o usuário pagador e salvar suas informações na variável user
-    const user = await UserModel.findOne({ fullName: payer});
+    const user = await UserModel.findOne({ id: payer});
     console.log(user.accountBalance)
+    console.log(user._id)
+
+    // return res.status(200).json(user);
 
     // Confere se quem está iniciando a transação é PJ, se sim, já encerra com msg transação não permitida.
     if (user.type === "PJ"){
@@ -53,11 +32,9 @@ router.post("/newtransaction", async (req, res) => {
 
     // Confere se o saldo é suficiente para a transação.
     if (user.accountBalance < value){
-      console.log("The Balance is enough")
+      console.log("Saldo Indisponível")
       return res.status(401).json({ msg: "Saldo Indisponível" });
     }
-
-    // return res.status(200).json(user);
 
     // Se passou por todos os ifs, prosseguir com a solicitação de Autorização externa
     const isAuthorized = await getAuthorization() 
@@ -69,7 +46,7 @@ router.post("/newtransaction", async (req, res) => {
       // return res.status(200).json(newTransaction);
 
     // localizar e atualizar o balance do payee
-    const userPayee = await UserModel.findOne({ fullName: payee});
+    const userPayee = await UserModel.findOne({ id: payee});
     // console.log(userPayee, userPayee._id)
     // return res.status(200).json(userPayee);
 

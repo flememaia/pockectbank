@@ -39,36 +39,36 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Login
-router.post("/login", async (req, res) => {
-  try {
-    // Extraindo o email e senha do corpo da requisição
-    const { email, password } = req.body;
+// // Login
+// router.post("/login", async (req, res) => {
+//   try {
+//     // Extraindo o email e senha do corpo da requisição
+//     const { email, password } = req.body;
 
-    // Pesquisar esse usuário no banco pelo email
-    const user = await UserModel.findOne({ email });
+//     // Pesquisar esse usuário no banco pelo email
+//     const user = await UserModel.findOne({ email });
 
-    console.log(user);
+//     console.log(user);
 
-    // Se o usuário não foi encontrado, significa que ele não é cadastrado
-    if (!user) {
-      return res
-        .status(400)
-        .json({ msg: "This email is not yet registered in our website;" });
-    }
+//     // Se o usuário não foi encontrado, significa que ele não é cadastrado
+//     if (!user) {
+//       return res
+//         .status(400)
+//         .json({ msg: "This email is not yet registered in our website;" });
+//     }
 
-    // Verificar se a senha do usuário pesquisado bate com a senha recebida pelo formulário
-    if (user.password === password) {
-      return res.status(200).json(user);
-    } else {
-      // 401 Significa Unauthorized
-      return res.status(401).json({ msg: "Wrong password or email" });
-    }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
-  }
-});
+//     // Verificar se a senha do usuário pesquisado bate com a senha recebida pelo formulário
+//     if (user.password === password) {
+//       return res.status(200).json(user);
+//     } else {
+//       // 401 Significa Unauthorized
+//       return res.status(401).json({ msg: "Wrong password or email" });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: JSON.stringify(err) });
+//   }
+// });
 
 // // cRud (READ) - HTTP GET
 // // Buscar dados do usuário => parametro de rota :userId
