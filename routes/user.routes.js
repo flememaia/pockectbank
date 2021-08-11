@@ -2,97 +2,38 @@ const router = require("express").Router();
 
 const UserModel = require("../models/User.model");
 
-// Crud (CREATE) - HTTP POST
-// Criar um novo usuário
+// Criar um novo usuário, com id sequencial
 router.post("/signup", async (req, res) => {
-  // Requisições do tipo POST tem uma propriedade especial chamada body, que carrega a informação enviada pelo cliente
-  console.log(req.body);
 
   try {
-    // Recuperar a senha que está vindo do corpo da requisição
-    const { password } = req.body;
 
-    // Verifica se a senha não está em branco ou se a senha não é complexa o suficiente
-    if (
-      !password ||
-      !password.match(
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/
-      )
-    ) {
-      // O código 400 significa Bad Request
-      return res.status(400).json({
-        msg: "Password is required and must have at least 8 characters, uppercase and lowercase letters, numbers and special characters.",
-      });
-    }
+    const lastInsertedUser = await UserModel.findOne(
+      {},
+      { id: 1 },
+      { sort: { id: -1 }, limit: 1 }
+    );
+
+    // id sequencial. Adicionar um ao ultimo numero de id criado. Caso ainda não exista usuários, 
+    // fixamos o valor em 1
+    const newId = lastInsertedUser
+      ? lastInsertedUser.id + 1
+      : 1;
 
     // Salva os dados de usuário no banco de dados (MongoDB) usando o body da requisição como parâmetro
-    const result = await UserModel.create({
+    // e o id sequencial = newId
+    const newUser = await UserModel.create({
       ...req.body,
+      id: newId
     });
 
-    // Responder o usuário recém-criado no banco para o cliente (solicitante). O status 201 significa Created
-    return res.status(201).json(result);
+    // Responder o usuário recém-criado no banco para o cliente (solicitante). 
+    // O status 201 significa Created
+    return res.status(201).json(newUser);
   } catch (err) {
     console.error(err);
     // O status 500 signifca Internal Server Error
     return res.status(500).json({ msg: JSON.stringify(err) });
   }
 });
-
-// // Login
-// router.post("/login", async (req, res) => {
-//   try {
-//     // Extraindo o email e senha do corpo da requisição
-//     const { email, password } = req.body;
-
-//     // Pesquisar esse usuário no banco pelo email
-//     const user = await UserModel.findOne({ email });
-
-//     console.log(user);
-
-//     // Se o usuário não foi encontrado, significa que ele não é cadastrado
-//     if (!user) {
-//       return res
-//         .status(400)
-//         .json({ msg: "This email is not yet registered in our website;" });
-//     }
-
-//     // Verificar se a senha do usuário pesquisado bate com a senha recebida pelo formulário
-//     if (user.password === password) {
-//       return res.status(200).json(user);
-//     } else {
-//       // 401 Significa Unauthorized
-//       return res.status(401).json({ msg: "Wrong password or email" });
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: JSON.stringify(err) });
-//   }
-// });
-
-// // cRud (READ) - HTTP GET
-// // Buscar dados do usuário => parametro de rota :userId
-// router.get("/profile/:userId", (req, res) => {
-//   console.log(req.headers);
-//   console.log(req.currentUser);
-
-//   try {
-//     // Buscar o usuário logado
-
-//     const { userId } = req.params
-    
-
-
-//     if (loggedInUser) {
-//       // Responder o cliente com os dados do usuário. O status 200 significa OK
-//       return res.status(200).json(loggedInUser);
-//     } else {
-//       return res.status(404).json({ msg: "User not found." });
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: JSON.stringify(err) });
-//   }
-// });
 
 module.exports = router;

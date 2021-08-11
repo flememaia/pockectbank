@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Aplicação back-end simplificada de transferências entre seus usuários. 
+Aplicação simplificada de transferências entre seus usuários (back-end). 
 
 ## Como funciona? 
 
@@ -14,7 +14,7 @@ Aplicação back-end simplificada de transferências entre seus usuários.
 - Conexão assíncrona com serviço de terceiro para envio de notificação de recebimento de pagamento ao usuário (email, sms).
 
 ## Diagrama Estrturação da Aplicação
-![Diagrama](/img/DiagramaEstruturaçãoDB.png)
+![diagrama entidade-relacionamento](diagram.png)
 
 ## Techs used
 JavaScript
