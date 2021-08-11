@@ -10,44 +10,42 @@ router.post("/newtransaction", async (req, res) => {
   try {
 
     // req.body sempre vem de quem inicia a transação, logo, sempre será "Efetuar Pagamento". 
-
-    const { type, payer, payee } = req.body
+    const { payer, payee } = req.body
 
     let { value } = req.body
 
-    // console.log(payer, value, payee)
-
-    // Localizar o usuário pagador e salvar suas informações na variável user
+    // Localizar o usuário ques está fazendo a transferência (payer) e salvar suas informações na variável user
     const user = await UserModel.findOne({ id: payer});
     console.log(user.accountBalance)
     console.log(user._id)
 
+    //#################DELETAR
     // return res.status(200).json(user);
 
-    // Confere se quem está iniciando a transação é PJ, se sim, já encerra com msg transação não permitida.
+    // Confere se quem está iniciando a transação é PJ, se sim, já encerra com msg de que a transação não é permitida.
     if (user.type === "PJ"){
       console.log("Esta transação não é permitida")
       return res.status(401).json({ msg: "Esta transação não é permitida" });
     }
 
-    // Confere se o saldo é suficiente para a transação.
+    // Passou pelo filtro PF, confere se o saldo é suficiente para a transação.
     if (user.accountBalance < value){
       console.log("Saldo Indisponível")
       return res.status(401).json({ msg: "Saldo Indisponível" });
     }
 
-    // Se passou por todos os ifs, prosseguir com a solicitação de Autorização externa
+    // Se o saldo for suficiente, prosseguir com a solicitação de Autorização externa
     const isAuthorized = await getAuthorization() 
-    // console.log(isAuthorized.message)
+
+    // Se autorizado, gerar a transação
     if( isAuthorized.message === "Autorizado"){
-      // console.log(user._id)
       const newTransaction = await TransactionModel.create({...req.body, userId: user._id})
-      // console.log(newTransaction)
+    //#################DELETAR
       // return res.status(200).json(newTransaction);
 
-    // localizar e atualizar o balance do payee
+    // Localizar e atualizar o balance do payee e incluir o id da transação no payee
     const userPayee = await UserModel.findOne({ id: payee});
-    // console.log(userPayee, userPayee._id)
+    //#################DELETAR
     // return res.status(200).json(userPayee);
 
     const updatedUserPayeeAccount = await UserModel.findOneAndUpdate(
@@ -56,18 +54,17 @@ router.post("/newtransaction", async (req, res) => {
         // $inc: operador de incremento do MongoDB. Para decrementar, incremente um valor negativo
         $inc: {
           accountBalance: value,
-        }, $push: { transactionId: newTransaction._id }
+        }, $push: { transactionId: newTransaction._id } 
       },
       { new: true }
     );
 
-    // console.log(updatedUserPayeeAccount)
     // return res.status(200).json(updatedUserPayeeAccount);
 
-    // atualizar o balance do payer para negativo
+    // atualizar o balance do payer para negativo (incrementar valor negativo)
     value = (- value)
-    // console.log(value)
 
+    // Atualizar o balance do payee e incluir o id da transação no payer (payer = user)
     const updatedUserAccount = await UserModel.findOneAndUpdate(
       { _id: user._id },
       {
@@ -79,11 +76,10 @@ router.post("/newtransaction", async (req, res) => {
       { new: true }
     );
 
-    // console.log(updatedUserAccount)
     // return res.status(200).json(updatedUserAccount);
 
+    // Enviar notificação de recebimento de pagamento de um serviço externo. 
     const confirmation = sendConfirmation() 
-    // console.log(confirmation.message)
 
     // Tudo dando certo, retornar a transação realizada, sem a necessidade de agaurdar a msg de confirmação ao destinatário. 
     return res.status(200).json(newTransaction);
